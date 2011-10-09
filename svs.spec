@@ -16,6 +16,9 @@ BuildRequires:	qt4-qmake >= 4.3.3-3
 BuildRequires:	rpmbuild(macros) >= 1.129
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
+%define		_sysconfdir	/etc/samba
+%define		_vfsdir		%{_libdir}/samba/vfs
+
 %description
 Samba Virus Scanner (SVS) -- Samba VFS plugin for transparent and
 parallel on-access virus scans.
@@ -29,7 +32,9 @@ qmake-qt4
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT%{_bindir}
+install -d $RPM_BUILD_ROOT{%{_sysconfdir},%{_vfsdir}}
+cp -p svs.ini.example $RPM_BUILD_ROOT%{_sysconfdir}/svs.ini
+install -p libsvs*.so* $RPM_BUILD_ROOT%{_vfsdir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -37,3 +42,5 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc CHANGES FAQ TODO README svs.ini.example
+%attr(600,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/svs.ini
+%attr(755,root,root) %{_vfsdir}/libsvs*.so
